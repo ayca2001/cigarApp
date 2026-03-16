@@ -70,8 +70,8 @@ input[type=text]{background:var(--subtle);border:0.5px solid var(--border);borde
 .toggle input{opacity:0;width:0;height:0}
 .toggle-slider{position:absolute;inset:0;background:#ccc;border-radius:26px;cursor:pointer;transition:.3s}
 .toggle-slider:before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
-.toggle input:checked+.toggle-slider{background:var(--accent)}
-.toggle input:checked+.toggle-slider:before{transform:translateX(18px)}
+.toggle input:checked + .toggle-slider{background:var(--accent)}
+.toggle input:checked + .toggle-slider:before{transform:translateX(18px)}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;justify-content:center}
 .modal-overlay.hidden{display:none}
 .modal{background:var(--card);border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-width:430px}
@@ -145,6 +145,9 @@ input[type=text]{background:var(--subtle);border:0.5px solid var(--border);borde
 
   <div class="section-title">Cigarette log</div>
   <div class="log-list" id="today-log"></div>
+
+  <div class="section-title">Coffee log</div>
+  <div class="log-list" id="today-coffee-log"></div>
 </div>
 
 <div class="page" id="page-history">
@@ -216,26 +219,32 @@ input[type=text]{background:var(--subtle);border:0.5px solid var(--border);borde
 <div class="toast" id="toast"></div>
 
 <script>
-const KD='sc_daily',KA='sc_all',KT='sc_total',KS='sc_settings';
+var KD='sc_daily', KA='sc_all', KT='sc_total', KS='sc_settings';
 
-function getData(){try{return JSON.parse(localStorage.getItem(KD)||'null')}catch{return null}}
-function getAllHistory(){try{return JSON.parse(localStorage.getItem(KA)||'[]')}catch{return[]}}
-function getTotal(){return parseInt(localStorage.getItem(KT)||'0')}
-function getSettings(){try{return JSON.parse(localStorage.getItem(KS)||'{"msg":"Don\'t smoke!","sound":true}')}catch{return{msg:"Don't smoke!",sound:true}}}
-
+function getData(){
+  try{ return JSON.parse(localStorage.getItem(KD)||'null'); }catch(e){ return null; }
+}
+function getAllHistory(){
+  try{ return JSON.parse(localStorage.getItem(KA)||'[]'); }catch(e){ return []; }
+}
+function getTotal(){
+  return parseInt(localStorage.getItem(KT)||'0');
+}
+function getSettings(){
+  try{ return JSON.parse(localStorage.getItem(KS)||'{"msg":"Don\'t smoke!","sound":true}'); }
+  catch(e){ return {msg:"Don't smoke!",sound:true}; }
+}
 function todayKey(){
-  const d=new Date();
+  var d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
-
 function checkReset(){
-  let d=getData();
-  const tk=todayKey();
+  var d=getData(), tk=todayKey();
   if(!d||d.date!==tk){
-    if(d&&d.date&&(d.smokeLogs?.length>0||d.coffeeLogs?.length>0||d.sport||d.score)){
-      let hist=getAllHistory();
-      hist.unshift({date:d.date,smoke:d.smokeLogs?.length||0,coffee:d.coffeeLogs?.length||0,sport:d.sport||null,score:d.score||null});
-      if(hist.length>90)hist=hist.slice(0,90);
+    if(d&&d.date&&((d.smokeLogs&&d.smokeLogs.length>0)||(d.coffeeLogs&&d.coffeeLogs.length>0)||d.sport||d.score)){
+      var hist=getAllHistory();
+      hist.unshift({date:d.date,smoke:d.smokeLogs?d.smokeLogs.length:0,coffee:d.coffeeLogs?d.coffeeLogs.length:0,sport:d.sport||null,score:d.score||null});
+      if(hist.length>90) hist=hist.slice(0,90);
       localStorage.setItem(KA,JSON.stringify(hist));
     }
     d={date:tk,smokeLogs:[],coffeeLogs:[],sport:null,score:null};
@@ -243,262 +252,278 @@ function checkReset(){
   }
   return d;
 }
-
-function saveDaily(d){localStorage.setItem(KD,JSON.stringify(d))}
-
+function saveDaily(d){
+  localStorage.setItem(KD,JSON.stringify(d));
+}
+function nowLabel(){
+  var n=new Date();
+  return n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');
+}
 function addSmoke(){
-  const d=checkReset();
-  const now=new Date();
-  const label=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  d.smokeLogs.push({ts:now.getTime(),label});
+  var d=checkReset(), label=nowLabel();
+  d.smokeLogs.push({ts:Date.now(),label:label});
   saveDaily(d);
   localStorage.setItem(KT,(getTotal()+1).toString());
   speakMsg();
-  const b=document.getElementById('smoke-add-btn');
-  b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');
+  var b=document.getElementById('smoke-add-btn');
+  b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
   render();
   showToast('🚬 Logged — '+label);
 }
-
 function addCoffee(){
-  const d=checkReset();
-  const now=new Date();
-  const label=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  d.coffeeLogs.push({ts:now.getTime(),label});
+  var d=checkReset(), label=nowLabel();
+  d.coffeeLogs.push({ts:Date.now(),label:label});
   saveDaily(d);
   render();
   showToast('☕ Coffee logged — '+label);
 }
-
 function deleteLastSmoke(){
-  const d=checkReset();
-  if(!d.smokeLogs.length)return;
+  var d=checkReset();
+  if(!d.smokeLogs.length) return;
   d.smokeLogs.pop();
   saveDaily(d);
   localStorage.setItem(KT,Math.max(0,getTotal()-1).toString());
   render();
   showToast('Cigarette entry removed');
 }
-
 function deleteLastCoffee(){
-  const d=checkReset();
-  if(!d.coffeeLogs.length)return;
+  var d=checkReset();
+  if(!d.coffeeLogs.length) return;
   d.coffeeLogs.pop();
   saveDaily(d);
   render();
   showToast('Coffee entry removed');
 }
-
 function deleteSmoke(idx){
-  const d=checkReset();
+  var d=checkReset();
   d.smokeLogs.splice(idx,1);
   saveDaily(d);
   localStorage.setItem(KT,Math.max(0,getTotal()-1).toString());
   render();
   showToast('Entry deleted');
 }
-
+function deleteCoffee(idx){
+  var d=checkReset();
+  d.coffeeLogs.splice(idx,1);
+  saveDaily(d);
+  render();
+  showToast('Coffee entry removed');
+}
 function setSport(type){
-  const d=checkReset();
-  d.sport=d.sport===type?null:type;
-  saveDaily(d);render();
-  if(d.sport)showToast('💪 '+type+' logged');
+  var d=checkReset();
+  d.sport=(d.sport===type)?null:type;
+  saveDaily(d); render();
+  if(d.sport) showToast('💪 '+type+' logged');
 }
-
 function speakMsg(){
-  const s=getSettings();
-  if(!s.sound||!window.speechSynthesis)return;
+  var s=getSettings();
+  if(!s.sound||!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(s.msg||"Don't smoke!");
-  u.lang='en-US';u.rate=1;u.volume=1;
+  var u=new SpeechSynthesisUtterance(s.msg||"Don't smoke!");
+  u.lang='en-US'; u.rate=1; u.volume=1;
   window.speechSynthesis.speak(u);
 }
-
 function testVoice(){
-  const msg=document.getElementById('voice-msg').value||"Don't smoke!";
-  if(!window.speechSynthesis){showToast('Speech not supported');return}
+  var msg=document.getElementById('voice-msg').value||"Don't smoke!";
+  if(!window.speechSynthesis){ showToast('Speech not supported'); return; }
   window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(msg);u.lang='en-US';
+  var u=new SpeechSynthesisUtterance(msg);
+  u.lang='en-US';
   window.speechSynthesis.speak(u);
 }
-
 function saveSettings(){
-  const msg=document.getElementById('voice-msg').value;
-  const sound=document.getElementById('sound-toggle').checked;
-  localStorage.setItem(KS,JSON.stringify({msg,sound}));
+  var msg=document.getElementById('voice-msg').value;
+  var sound=document.getElementById('sound-toggle').checked;
+  localStorage.setItem(KS,JSON.stringify({msg:msg,sound:sound}));
   showToast('Saved!');
 }
-
 function clearAll(){
-  if(!confirm('Delete all data? This cannot be undone.'))return;
-  [KD,KA,KT].forEach(k=>localStorage.removeItem(k));
-  render();showToast('All data deleted');
+  if(!confirm('Delete all data? This cannot be undone.')) return;
+  [KD,KA,KT].forEach(function(k){ localStorage.removeItem(k); });
+  render();
+  showToast('All data deleted');
 }
-
 function openScoreModal(){
-  const d=checkReset();
-  document.getElementById('score-modal-sub').textContent=d.score?'Current: '+d.score+'/10 — change it':'How was today?';
-  const grid=document.getElementById('score-grid');
+  var d=checkReset();
+  document.getElementById('score-modal-sub').textContent=d.score?('Current: '+d.score+'/10 — change it'):'How was today?';
+  var grid=document.getElementById('score-grid');
   grid.innerHTML='';
-  for(let i=1;i<=10;i++){
-    const btn=document.createElement('button');
-    btn.className='score-opt'+(d.score===i?' selected':'');
-    btn.textContent=i;
-    btn.onclick=()=>setScore(i);
-    grid.appendChild(btn);
+  for(var i=1;i<=10;i++){
+    (function(n){
+      var btn=document.createElement('button');
+      btn.className='score-opt'+(d.score===n?' selected':'');
+      btn.textContent=n;
+      btn.onclick=function(){ setScore(n); };
+      grid.appendChild(btn);
+    })(i);
   }
   document.getElementById('score-modal').classList.remove('hidden');
 }
-
-function closeScoreModal(){document.getElementById('score-modal').classList.add('hidden')}
-
-function setScore(n){
-  const d=checkReset();d.score=n;saveDaily(d);
-  closeScoreModal();render();showToast('⭐ Day rated '+n+'/10');
+function closeScoreModal(){
+  document.getElementById('score-modal').classList.add('hidden');
 }
-
+function setScore(n){
+  var d=checkReset();
+  d.score=n; saveDaily(d);
+  closeScoreModal(); render();
+  showToast('⭐ Day rated '+n+'/10');
+}
 function showPage(name,el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
   document.getElementById('page-'+name).classList.add('active');
   el.classList.add('active');
-  if(name==='history')renderHistory();
+  if(name==='history') renderHistory();
   if(name==='settings'){
-    const s=getSettings();
+    var s=getSettings();
     document.getElementById('voice-msg').value=s.msg||"Don't smoke!";
     document.getElementById('sound-toggle').checked=s.sound!==false;
   }
 }
-
 function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(function(){ t.classList.remove('show'); },2200);
 }
-
 function drawLung(count){
-  const canvas=document.getElementById('lung-canvas');
-  const ctx=canvas.getContext('2d');
+  var canvas=document.getElementById('lung-canvas');
+  var ctx=canvas.getContext('2d');
   ctx.clearRect(0,0,260,185);
-  const ratio=Math.min(count/30,1);
-  const isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
-  const base=isDark?200:60;
-  const gv=Math.round(base+ratio*(isDark?-150:150));
-  const lc=`rgb(${gv},${gv},${gv})`;
-  const stroke=isDark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)';
-  const drawLobe=(flip)=>{
-    ctx.save();ctx.beginPath();
-    if(!flip){ctx.moveTo(115,36);ctx.bezierCurveTo(72,36,48,64,48,102);ctx.bezierCurveTo(48,144,67,162,96,162);ctx.bezierCurveTo(106,165,111,157,115,143);}
-    else{ctx.moveTo(145,36);ctx.bezierCurveTo(188,36,212,64,212,102);ctx.bezierCurveTo(212,144,193,162,164,162);ctx.bezierCurveTo(154,165,149,157,145,143);}
-    ctx.closePath();ctx.fillStyle=lc;ctx.fill();
-    ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
-  };
-  drawLobe(false);drawLobe(true);
+  var t=Math.min(count/6,1);
+  var r=Math.round(40+t*200);
+  var g=Math.round(160-t*130);
+  var b=Math.round(60-t*50);
+  var lc='rgb('+r+','+g+','+b+')';
+  var isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
+  var stroke=isDark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)';
+  function drawLobe(flip){
+    ctx.save(); ctx.beginPath();
+    if(!flip){
+      ctx.moveTo(115,36); ctx.bezierCurveTo(72,36,48,64,48,102);
+      ctx.bezierCurveTo(48,144,67,162,96,162);
+      ctx.bezierCurveTo(106,165,111,157,115,143);
+    } else {
+      ctx.moveTo(145,36); ctx.bezierCurveTo(188,36,212,64,212,102);
+      ctx.bezierCurveTo(212,144,193,162,164,162);
+      ctx.bezierCurveTo(154,165,149,157,145,143);
+    }
+    ctx.closePath();
+    ctx.fillStyle=lc; ctx.fill();
+    ctx.strokeStyle=stroke; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.restore();
+  }
+  drawLobe(false); drawLobe(true);
   if(count>0){
-    const spots=Math.min(Math.floor(count/2)+1,14);
-    const rng=s=>{let x=Math.sin(s)*10000;return x-Math.floor(x)};
+    var ratio=Math.min(count/30,1);
+    var spots=Math.min(Math.floor(count/2)+1,14);
+    function rng(s){ var x=Math.sin(s)*10000; return x-Math.floor(x); }
     ctx.globalAlpha=Math.min(0.12+ratio*0.45,0.55);
-    for(let i=0;i<spots;i++){
-      const side=i%2;
-      const cx=side===0?(65+rng(i*7)*36):(152+rng(i*7)*36);
-      const cy=72+rng(i*13)*76,rr=5+rng(i*17)*7;
-      ctx.beginPath();ctx.arc(cx,cy,rr,0,Math.PI*2);
-      ctx.fillStyle=isDark?'#000':'#333';ctx.fill();
+    for(var i=0;i<spots;i++){
+      var side=i%2;
+      var cx=side===0?(65+rng(i*7)*36):(152+rng(i*7)*36);
+      var cy=72+rng(i*13)*76, rr=5+rng(i*17)*7;
+      ctx.beginPath(); ctx.arc(cx,cy,rr,0,Math.PI*2);
+      ctx.fillStyle=isDark?'#000':'#2a1a00'; ctx.fill();
     }
     ctx.globalAlpha=1;
   }
   ctx.save();
-  ctx.beginPath();ctx.moveTo(130,18);ctx.lineTo(130,44);
-  ctx.moveTo(130,44);ctx.bezierCurveTo(116,49,107,55,102,63);
-  ctx.moveTo(130,44);ctx.bezierCurveTo(144,49,153,55,158,63);
-  ctx.strokeStyle=isDark?'rgba(255,255,255,.22)':'rgba(0,0,0,.15)';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.stroke();ctx.restore();
-  const fx=130,fy=14,fr=12;
-  ctx.save();ctx.beginPath();ctx.arc(fx,fy,fr,0,Math.PI*2);
-  const happy=ratio<0.3,med=ratio<0.65;
-  const fg=isDark?(happy?200:med?150:100):(happy?220:med?170:120);
-  ctx.fillStyle=`rgb(${fg},${fg},${fg})`;ctx.fill();
-  ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();
-  const ec='rgba(0,0,0,.7)';
+  ctx.beginPath(); ctx.moveTo(130,18); ctx.lineTo(130,44);
+  ctx.moveTo(130,44); ctx.bezierCurveTo(116,49,107,55,102,63);
+  ctx.moveTo(130,44); ctx.bezierCurveTo(144,49,153,55,158,63);
+  ctx.strokeStyle=isDark?'rgba(255,255,255,.22)':'rgba(0,0,0,.15)';
+  ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.stroke(); ctx.restore();
+  var ratio2=Math.min(count/30,1);
+  var happy=ratio2<0.3, med=ratio2<0.65;
+  var fx=130,fy=14,fr=12;
+  ctx.save(); ctx.beginPath(); ctx.arc(fx,fy,fr,0,Math.PI*2);
+  var fg=isDark?(happy?180:med?140:100):(happy?220:med?180:130);
+  ctx.fillStyle='rgb('+fg+','+fg+','+fg+')'; ctx.fill();
+  ctx.strokeStyle=stroke; ctx.lineWidth=1; ctx.stroke();
+  var ec='rgba(0,0,0,.7)';
   ctx.fillStyle=ec;
   if(!happy&&!med){
-    ctx.lineWidth=1.5;ctx.strokeStyle=ec;
-    for(const ex of [fx-4,fx+4]){
-      ctx.beginPath();ctx.moveTo(ex-2,fy-4);ctx.lineTo(ex+2,fy-2);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(ex+2,fy-4);ctx.lineTo(ex-2,fy-2);ctx.stroke();
-    }
-  }else{
-    ctx.beginPath();ctx.arc(fx-4,fy-2,1.5,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();ctx.arc(fx+4,fy-2,1.5,0,Math.PI*2);ctx.fill();
+    ctx.lineWidth=1.5; ctx.strokeStyle=ec;
+    [fx-4,fx+4].forEach(function(ex){
+      ctx.beginPath(); ctx.moveTo(ex-2,fy-4); ctx.lineTo(ex+2,fy-2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ex+2,fy-4); ctx.lineTo(ex-2,fy-2); ctx.stroke();
+    });
+  } else {
+    ctx.beginPath(); ctx.arc(fx-4,fy-2,1.5,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(fx+4,fy-2,1.5,0,Math.PI*2); ctx.fill();
   }
-  ctx.strokeStyle=ec;ctx.lineWidth=1.8;ctx.lineCap='round';
+  ctx.strokeStyle=ec; ctx.lineWidth=1.8; ctx.lineCap='round';
   ctx.beginPath();
-  if(happy)ctx.arc(fx,fy+1,5,0.2,Math.PI-0.2);
-  else if(med){ctx.moveTo(fx-5,fy+5);ctx.lineTo(fx+5,fy+5);}
+  if(happy) ctx.arc(fx,fy+1,5,0.2,Math.PI-0.2);
+  else if(med){ ctx.moveTo(fx-5,fy+5); ctx.lineTo(fx+5,fy+5); }
   else ctx.arc(fx,fy+8,5,Math.PI+0.2,-0.2);
-  ctx.stroke();ctx.restore();
+  ctx.stroke(); ctx.restore();
 }
-
 function render(){
-  const d=checkReset();
-  const smoke=d.smokeLogs.length;
-  const coffee=d.coffeeLogs.length;
-  const now=new Date();
-  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var d=checkReset();
+  var smoke=d.smokeLogs.length, coffee=d.coffeeLogs.length;
+  var now=new Date();
+  var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('today-label').textContent=days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()];
   document.getElementById('today-smoke').textContent=smoke;
   document.getElementById('today-coffee').textContent=coffee;
-
-  const scoreBtn=document.getElementById('score-btn');
-  scoreBtn.textContent=d.score?d.score+'/10':'?/10';
+  var scoreBtn=document.getElementById('score-btn');
+  scoreBtn.textContent=d.score?(d.score+'/10'):'?/10';
   scoreBtn.className='day-score-btn'+(d.score?' rated':'');
-
   document.getElementById('smoke-del-btn').style.visibility=smoke>0?'visible':'hidden';
   document.getElementById('coffee-del-btn').style.visibility=coffee>0?'visible':'hidden';
-
-  const sportMap={'Leg Day':'leg','Upper Body':'upper','Cardio':'cardio','Rest Day':'rest'};
-  ['leg','upper','cardio','rest'].forEach(k=>document.getElementById('sport-'+k).className='sport-opt');
-  if(d.sport&&sportMap[d.sport])document.getElementById('sport-'+sportMap[d.sport]).className='sport-opt active';
+  var sportMap={'Leg Day':'leg','Upper Body':'upper','Cardio':'cardio','Rest Day':'rest'};
+  ['leg','upper','cardio','rest'].forEach(function(k){ document.getElementById('sport-'+k).className='sport-opt'; });
+  if(d.sport&&sportMap[d.sport]) document.getElementById('sport-'+sportMap[d.sport]).className='sport-opt active';
   document.getElementById('sport-done-tag').style.display=d.sport?'':'none';
-
-  const logEl=document.getElementById('today-log');
-  logEl.innerHTML=smoke===0
-    ?'<div class="empty">No cigarettes today 🎉</div>'
-    :d.smokeLogs.map((l,i)=>`<div class="log-item"><div><div class="log-time">${l.label}</div><div class="log-num">#${i+1}</div></div><button class="log-del" onclick="deleteSmoke(${i})">×</button></div>`).reverse().join('');
-
+  var logEl=document.getElementById('today-log');
+  if(smoke===0){
+    logEl.innerHTML='<div class="empty">No cigarettes today 🎉</div>';
+  } else {
+    logEl.innerHTML=d.smokeLogs.map(function(l,i){
+      return '<div class="log-item"><div><div class="log-time">'+l.label+'</div><div class="log-num">#'+(i+1)+'</div></div><button class="log-del" onclick="deleteSmoke('+i+')">×</button></div>';
+    }).reverse().join('');
+  }
+  var coffeeLogEl=document.getElementById('today-coffee-log');
+  if(coffee===0){
+    coffeeLogEl.innerHTML='<div class="empty">No coffees today</div>';
+  } else {
+    coffeeLogEl.innerHTML=d.coffeeLogs.map(function(l,i){
+      return '<div class="log-item"><div><div class="log-time">'+l.label+'</div><div class="log-num">#'+(i+1)+'</div></div><button class="log-del" onclick="deleteCoffee('+i+')">×</button></div>';
+    }).reverse().join('');
+  }
   drawLung(smoke);
 }
-
 function renderHistory(){
-  const hist=getAllHistory();
-  const el=document.getElementById('history-list');
-  if(hist.length===0){el.innerHTML='<div class="empty">No history yet</div>';return}
-  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  el.innerHTML=hist.map((h,i)=>{
-    const prev=hist[i+1];
-    const diff=prev!=null?h.smoke-prev.smoke:null;
-    let diffHtml='';
+  var hist=getAllHistory();
+  var el=document.getElementById('history-list');
+  if(hist.length===0){ el.innerHTML='<div class="empty">No history yet</div>'; return; }
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  el.innerHTML=hist.map(function(h,i){
+    var prev=hist[i+1];
+    var diff=prev!=null?h.smoke-prev.smoke:null;
+    var diffHtml='';
     if(diff!==null){
-      if(diff<0)diffHtml=`<span class="hist-diff">${diff} less</span>`;
-      else if(diff>0)diffHtml=`<span class="hist-diff">+${diff} more</span>`;
-      else diffHtml=`<span class="hist-diff">same</span>`;
+      if(diff<0) diffHtml='<span class="hist-diff">'+diff+' less</span>';
+      else if(diff>0) diffHtml='<span class="hist-diff">+'+diff+' more</span>';
+      else diffHtml='<span class="hist-diff">same</span>';
     }
-    const [y,m,d2]=h.date.split('-');
-    const scoreStr=h.score?`<span class="hist-score">${h.score}/10</span>`:'';
-    const sportStr=h.sport?`<span class="sport-tag">${h.sport}</span>`:'';
-    return`<div class="hist-day">
-      <div class="hist-date"><span>${parseInt(d2)} ${months[parseInt(m)-1]} ${y}</span>${scoreStr}</div>
-      <div class="hist-row">
-        <div class="hist-stat"><div class="hist-stat-val">🚬 ${h.smoke}</div><div class="hist-stat-lbl">cigarettes</div></div>
-        <div class="hist-stat"><div class="hist-stat-val">☕ ${h.coffee||0}</div><div class="hist-stat-lbl">coffees</div></div>
-        ${h.sport?`<div class="hist-stat">${sportStr}</div>`:''}
-        ${diffHtml}
-      </div>
-    </div>`;
+    var parts=h.date.split('-');
+    var scoreStr=h.score?('<span class="hist-score">'+h.score+'/10</span>'):'';
+    var sportStr=h.sport?('<span class="sport-tag">'+h.sport+'</span>'):'';
+    return '<div class="hist-day">'
+      +'<div class="hist-date"><span>'+parseInt(parts[2])+' '+months[parseInt(parts[1])-1]+' '+parts[0]+'</span>'+scoreStr+'</div>'
+      +'<div class="hist-row">'
+      +'<div class="hist-stat"><div class="hist-stat-val">🚬 '+h.smoke+'</div><div class="hist-stat-lbl">cigarettes</div></div>'
+      +'<div class="hist-stat"><div class="hist-stat-val">☕ '+(h.coffee||0)+'</div><div class="hist-stat-lbl">coffees</div></div>'
+      +(h.sport?('<div class="hist-stat">'+sportStr+'</div>'):'')
+      +diffHtml
+      +'</div></div>';
   }).join('');
 }
-
-setInterval(()=>{const d=getData();if(d&&d.date!==todayKey())render();},60000);
+setInterval(function(){ var d=getData(); if(d&&d.date!==todayKey()) render(); },60000);
 render();
 </script>
 </body>
