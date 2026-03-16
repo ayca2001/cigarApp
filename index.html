@@ -9,48 +9,38 @@
 <title>Daily Tracker</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#f2f2f2;--card:#fff;--border:#ddd;--text:#111;--muted:#888;
-  --accent:#222;--accent2:#444;--subtle:#e8e8e8;
-}
-@media(prefers-color-scheme:dark){
-  :root{--bg:#111;--card:#1c1c1c;--border:#2a2a2a;--text:#f0f0f0;--muted:#666;--accent:#eee;--accent2:#aaa;--subtle:#252525}
-}
+:root{--bg:#f2f2f2;--card:#fff;--border:#ddd;--text:#111;--muted:#888;--accent:#222;--subtle:#e8e8e8}
+@media(prefers-color-scheme:dark){:root{--bg:#111;--card:#1c1c1c;--border:#2a2a2a;--text:#f0f0f0;--muted:#666;--accent:#eee;--subtle:#252525}}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .app{max-width:430px;margin:0 auto;padding:0 0 80px}
-
 .tab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--card);border-top:0.5px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
 .tab-btn{flex:1;padding:12px 0 10px;background:none;border:none;cursor:pointer;font-size:10px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s}
 .tab-btn.active{color:var(--text)}
 .tab-icon{font-size:20px;line-height:1}
-
 .page{display:none;padding:16px}
 .page.active{display:block}
-
 .header{text-align:center;padding:20px 0 4px}
-.header h1{font-size:17px;font-weight:600;letter-spacing:.2px}
+.header h1{font-size:17px;font-weight:600}
 .date-label{font-size:13px;color:var(--muted);margin-top:3px}
 .day-score-wrap{display:flex;justify-content:center;margin-top:7px}
 .day-score-btn{background:none;border:0.5px solid var(--border);cursor:pointer;font-size:12px;color:var(--muted);font-weight:500;padding:4px 14px;border-radius:20px}
-.day-score-btn.rated{color:var(--text);border-color:var(--accent2)}
-
+.day-score-btn.rated{color:var(--text);border-color:var(--accent)}
 .tracker-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
 .tracker-card{background:var(--card);border:0.5px solid var(--border);border-radius:18px;padding:16px 14px;display:flex;flex-direction:column;gap:12px}
 .tracker-card.full{grid-column:1/-1}
 .card-title{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
-.card-count{font-size:36px;font-weight:700;line-height:1;color:var(--text)}
+.card-count{font-size:36px;font-weight:700;line-height:1}
 .card-sub{font-size:11px;color:var(--muted);margin-top:2px}
-
-.add-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;color:var(--bg);font-size:26px;font-weight:300;display:flex;align-items:center;justify-content:center;transition:transform .1s,opacity .1s;align-self:flex-end;line-height:1}
+.card-footer{display:flex;align-items:center;justify-content:space-between}
+.add-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;color:var(--bg);font-size:26px;display:flex;align-items:center;justify-content:center;transition:transform .1s,opacity .1s;flex-shrink:0}
 .add-btn:active{transform:scale(.9);opacity:.75}
-
+.del-btn{background:none;border:none;cursor:pointer;color:var(--border);font-size:24px;line-height:1;padding:4px}
+.del-btn:active{color:var(--text)}
 .sport-btns{display:flex;flex-direction:column;gap:7px}
 .sport-opt{width:100%;padding:10px 14px;border:0.5px solid var(--border);border-radius:12px;background:none;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;text-align:left}
 .sport-opt.active{border-color:var(--text);background:var(--subtle);color:var(--text)}
 .sport-opt:active{transform:scale(.98)}
-
 .lung-wrap{display:flex;justify-content:center;margin:4px 0 0}
-
 .section-title{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin:18px 0 8px}
 .log-list{display:flex;flex-direction:column;gap:7px}
 .log-item{background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between}
@@ -59,20 +49,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .log-del{background:none;border:none;cursor:pointer;color:var(--border);font-size:20px;padding:0 0 0 12px;line-height:1}
 .log-del:active{color:var(--text)}
 .empty{text-align:center;color:var(--muted);font-size:14px;padding:30px 0}
-
 .hist-day{background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px}
 .hist-date{font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
-.hist-score{font-size:12px;color:var(--accent2);font-weight:600}
+.hist-score{font-size:12px;color:var(--muted);font-weight:600}
 .hist-row{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap;align-items:center}
 .hist-stat{display:flex;flex-direction:column}
 .hist-stat-val{font-size:18px;font-weight:700}
 .hist-stat-lbl{font-size:11px;color:var(--muted)}
-.hist-diff{font-size:12px;font-weight:500;padding:2px 9px;border-radius:20px}
-.diff-good{background:var(--subtle);color:var(--accent2)}
-.diff-bad{background:var(--subtle);color:var(--muted)}
-.diff-same{background:var(--subtle);color:var(--muted)}
-.sport-tag{font-size:11px;padding:2px 9px;border-radius:10px;background:var(--subtle);color:var(--accent2);font-weight:500}
-
+.hist-diff{font-size:12px;font-weight:500;padding:2px 9px;border-radius:20px;background:var(--subtle);color:var(--muted)}
+.sport-tag{font-size:11px;padding:2px 9px;border-radius:10px;background:var(--subtle);color:var(--muted);font-weight:500}
 .settings-card{background:var(--card);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
 .setting-row{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border)}
 .setting-row:last-child{border-bottom:none}
@@ -81,14 +66,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 input[type=text]{background:var(--subtle);border:0.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:15px;color:var(--text);width:100%;margin-top:8px;outline:none}
 .save-btn{width:100%;padding:13px;background:var(--accent);color:var(--bg);border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
 .save-btn:active{opacity:.8}
-
 .toggle{position:relative;width:44px;height:26px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0}
 .toggle-slider{position:absolute;inset:0;background:#ccc;border-radius:26px;cursor:pointer;transition:.3s}
 .toggle-slider:before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
 .toggle input:checked+.toggle-slider{background:var(--accent)}
 .toggle input:checked+.toggle-slider:before{transform:translateX(18px)}
-
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;justify-content:center}
 .modal-overlay.hidden{display:none}
 .modal{background:var(--card);border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-width:430px}
@@ -99,7 +82,6 @@ input[type=text]{background:var(--subtle);border:0.5px solid var(--border);borde
 .score-opt:active{transform:scale(.94)}
 .score-opt.selected{background:var(--accent);border-color:var(--accent);color:var(--bg)}
 .modal-cancel{width:100%;padding:13px;background:none;border:0.5px solid var(--border);border-radius:14px;font-size:15px;color:var(--muted);cursor:pointer;margin-top:4px}
-
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--accent);color:var(--bg);padding:10px 20px;border-radius:24px;font-size:14px;opacity:0;transition:all .3s;pointer-events:none;z-index:200;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.08)}100%{transform:scale(1)}}
@@ -125,7 +107,10 @@ input[type=text]{background:var(--subtle);border:0.5px solid var(--border);borde
         <div class="card-count" id="today-smoke">0</div>
         <div class="card-sub">today</div>
       </div>
-      <button class="add-btn" id="smoke-btn" onclick="addSmoke()">+</button>
+      <div class="card-footer">
+        <button class="del-btn" id="smoke-del-btn" onclick="deleteLastSmoke()">×</button>
+        <button class="add-btn" id="smoke-add-btn" onclick="addSmoke()">+</button>
+      </div>
     </div>
 
     <div class="tracker-card">
@@ -134,19 +119,22 @@ input[type=text]{background:var(--subtle);border:0.5px solid var(--border);borde
         <div class="card-count" id="today-coffee">0</div>
         <div class="card-sub">today</div>
       </div>
-      <button class="add-btn" onclick="addCoffee()">+</button>
+      <div class="card-footer">
+        <button class="del-btn" id="coffee-del-btn" onclick="deleteLastCoffee()">×</button>
+        <button class="add-btn" onclick="addCoffee()">+</button>
+      </div>
     </div>
 
     <div class="tracker-card full">
       <div style="display:flex;align-items:center;justify-content:space-between">
-        <div class="card-title"> Workout</div>
+        <div class="card-title">💪 Workout</div>
         <span id="sport-done-tag" style="display:none" class="sport-tag">✓ Done</span>
       </div>
       <div class="sport-btns">
-        <button class="sport-opt" id="sport-leg" onclick="setSport('Leg Day')"> Leg Day</button>
-        <button class="sport-opt" id="sport-upper" onclick="setSport('Upper Body')"> Upper Body</button>
-        <button class="sport-opt" id="sport-cardio" onclick="setSport('Cardio')"> Cardio</button>
-        <button class="sport-opt" id="sport-rest" onclick="setSport('Rest Day')"> Rest Day</button>
+        <button class="sport-opt" id="sport-leg" onclick="setSport('Leg Day')">🦵 Leg Day</button>
+        <button class="sport-opt" id="sport-upper" onclick="setSport('Upper Body')">💪 Upper Body</button>
+        <button class="sport-opt" id="sport-cardio" onclick="setSport('Cardio')">🏃 Cardio</button>
+        <button class="sport-opt" id="sport-rest" onclick="setSport('Rest Day')">😴 Rest Day</button>
       </div>
     </div>
   </div>
@@ -229,13 +217,20 @@ input[type=text]{background:var(--subtle);border:0.5px solid var(--border);borde
 
 <script>
 const KD='sc_daily',KA='sc_all',KT='sc_total',KS='sc_settings';
+
 function getData(){try{return JSON.parse(localStorage.getItem(KD)||'null')}catch{return null}}
 function getAllHistory(){try{return JSON.parse(localStorage.getItem(KA)||'[]')}catch{return[]}}
 function getTotal(){return parseInt(localStorage.getItem(KT)||'0')}
 function getSettings(){try{return JSON.parse(localStorage.getItem(KS)||'{"msg":"Don\'t smoke!","sound":true}')}catch{return{msg:"Don't smoke!",sound:true}}}
-function todayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+
+function todayKey(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
 function checkReset(){
-  let d=getData();const tk=todayKey();
+  let d=getData();
+  const tk=todayKey();
   if(!d||d.date!==tk){
     if(d&&d.date&&(d.smokeLogs?.length>0||d.coffeeLogs?.length>0||d.sport||d.score)){
       let hist=getAllHistory();
@@ -248,7 +243,9 @@ function checkReset(){
   }
   return d;
 }
+
 function saveDaily(d){localStorage.setItem(KD,JSON.stringify(d))}
+
 function addSmoke(){
   const d=checkReset();
   const now=new Date();
@@ -256,28 +253,58 @@ function addSmoke(){
   d.smokeLogs.push({ts:now.getTime(),label});
   saveDaily(d);
   localStorage.setItem(KT,(getTotal()+1).toString());
-  speakMsg();animBtn('smoke-btn');render();
+  speakMsg();
+  const b=document.getElementById('smoke-add-btn');
+  b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');
+  render();
   showToast('🚬 Logged — '+label);
 }
+
 function addCoffee(){
   const d=checkReset();
   const now=new Date();
   const label=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
   d.coffeeLogs.push({ts:now.getTime(),label});
-  saveDaily(d);render();
+  saveDaily(d);
+  render();
   showToast('☕ Coffee logged — '+label);
 }
+
+function deleteLastSmoke(){
+  const d=checkReset();
+  if(!d.smokeLogs.length)return;
+  d.smokeLogs.pop();
+  saveDaily(d);
+  localStorage.setItem(KT,Math.max(0,getTotal()-1).toString());
+  render();
+  showToast('Cigarette entry removed');
+}
+
+function deleteLastCoffee(){
+  const d=checkReset();
+  if(!d.coffeeLogs.length)return;
+  d.coffeeLogs.pop();
+  saveDaily(d);
+  render();
+  showToast('Coffee entry removed');
+}
+
+function deleteSmoke(idx){
+  const d=checkReset();
+  d.smokeLogs.splice(idx,1);
+  saveDaily(d);
+  localStorage.setItem(KT,Math.max(0,getTotal()-1).toString());
+  render();
+  showToast('Entry deleted');
+}
+
 function setSport(type){
   const d=checkReset();
   d.sport=d.sport===type?null:type;
   saveDaily(d);render();
   if(d.sport)showToast('💪 '+type+' logged');
 }
-function deleteSmoke(idx){
-  const d=checkReset();d.smokeLogs.splice(idx,1);saveDaily(d);
-  localStorage.setItem(KT,Math.max(0,getTotal()-1).toString());
-  render();showToast('Entry deleted');
-}
+
 function speakMsg(){
   const s=getSettings();
   if(!s.sound||!window.speechSynthesis)return;
@@ -286,6 +313,7 @@ function speakMsg(){
   u.lang='en-US';u.rate=1;u.volume=1;
   window.speechSynthesis.speak(u);
 }
+
 function testVoice(){
   const msg=document.getElementById('voice-msg').value||"Don't smoke!";
   if(!window.speechSynthesis){showToast('Speech not supported');return}
@@ -293,49 +321,61 @@ function testVoice(){
   const u=new SpeechSynthesisUtterance(msg);u.lang='en-US';
   window.speechSynthesis.speak(u);
 }
+
 function saveSettings(){
   const msg=document.getElementById('voice-msg').value;
   const sound=document.getElementById('sound-toggle').checked;
   localStorage.setItem(KS,JSON.stringify({msg,sound}));
   showToast('Saved!');
 }
+
 function clearAll(){
   if(!confirm('Delete all data? This cannot be undone.'))return;
   [KD,KA,KT].forEach(k=>localStorage.removeItem(k));
   render();showToast('All data deleted');
 }
+
 function openScoreModal(){
   const d=checkReset();
-  document.getElementById('score-modal-sub').textContent=d.score?'Current score: '+d.score+'/10 — change it':'How was today?';
-  const grid=document.getElementById('score-grid');grid.innerHTML='';
+  document.getElementById('score-modal-sub').textContent=d.score?'Current: '+d.score+'/10 — change it':'How was today?';
+  const grid=document.getElementById('score-grid');
+  grid.innerHTML='';
   for(let i=1;i<=10;i++){
     const btn=document.createElement('button');
     btn.className='score-opt'+(d.score===i?' selected':'');
-    btn.textContent=i;btn.onclick=()=>setScore(i);
+    btn.textContent=i;
+    btn.onclick=()=>setScore(i);
     grid.appendChild(btn);
   }
   document.getElementById('score-modal').classList.remove('hidden');
 }
+
 function closeScoreModal(){document.getElementById('score-modal').classList.add('hidden')}
+
 function setScore(n){
   const d=checkReset();d.score=n;saveDaily(d);
   closeScoreModal();render();showToast('⭐ Day rated '+n+'/10');
 }
-function animBtn(id){
-  const b=document.getElementById(id);
-  b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');
-}
+
 function showPage(name,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');el.classList.add('active');
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
   if(name==='history')renderHistory();
-  if(name==='settings'){const s=getSettings();document.getElementById('voice-msg').value=s.msg||"Don't smoke!";document.getElementById('sound-toggle').checked=s.sound!==false;}
+  if(name==='settings'){
+    const s=getSettings();
+    document.getElementById('voice-msg').value=s.msg||"Don't smoke!";
+    document.getElementById('sound-toggle').checked=s.sound!==false;
+  }
 }
+
 function showToast(msg){
-  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);
 }
+
 function drawLung(count){
   const canvas=document.getElementById('lung-canvas');
   const ctx=canvas.getContext('2d');
@@ -343,10 +383,8 @@ function drawLung(count){
   const ratio=Math.min(count/30,1);
   const isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
   const base=isDark?200:60;
-  const rv=Math.round(base+ratio*(isDark?-150:150));
   const gv=Math.round(base+ratio*(isDark?-150:150));
-  const bv=Math.round(base+ratio*(isDark?-150:150));
-  const lc=`rgb(${rv},${gv},${bv})`;
+  const lc=`rgb(${gv},${gv},${gv})`;
   const stroke=isDark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)';
   const drawLobe=(flip)=>{
     ctx.save();ctx.beginPath();
@@ -377,57 +415,73 @@ function drawLung(count){
   const fx=130,fy=14,fr=12;
   ctx.save();ctx.beginPath();ctx.arc(fx,fy,fr,0,Math.PI*2);
   const happy=ratio<0.3,med=ratio<0.65;
-  const faceGray=isDark?(happy?200:med?150:100):(happy?220:med?170:120);
-  ctx.fillStyle=`rgb(${faceGray},${faceGray},${faceGray})`;ctx.fill();
+  const fg=isDark?(happy?200:med?150:100):(happy?220:med?170:120);
+  ctx.fillStyle=`rgb(${fg},${fg},${fg})`;ctx.fill();
   ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();
-  const eyeColor=isDark?'rgba(0,0,0,.8)':'rgba(0,0,0,.7)';
-  ctx.fillStyle=eyeColor;
+  const ec='rgba(0,0,0,.7)';
+  ctx.fillStyle=ec;
   if(!happy&&!med){
-    ctx.lineWidth=1.5;ctx.strokeStyle=eyeColor;
+    ctx.lineWidth=1.5;ctx.strokeStyle=ec;
     for(const ex of [fx-4,fx+4]){
       ctx.beginPath();ctx.moveTo(ex-2,fy-4);ctx.lineTo(ex+2,fy-2);ctx.stroke();
       ctx.beginPath();ctx.moveTo(ex+2,fy-4);ctx.lineTo(ex-2,fy-2);ctx.stroke();
     }
-  }else{ctx.beginPath();ctx.arc(fx-4,fy-2,1.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(fx+4,fy-2,1.5,0,Math.PI*2);ctx.fill();}
-  ctx.strokeStyle=eyeColor;ctx.lineWidth=1.8;ctx.lineCap='round';
+  }else{
+    ctx.beginPath();ctx.arc(fx-4,fy-2,1.5,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(fx+4,fy-2,1.5,0,Math.PI*2);ctx.fill();
+  }
+  ctx.strokeStyle=ec;ctx.lineWidth=1.8;ctx.lineCap='round';
   ctx.beginPath();
   if(happy)ctx.arc(fx,fy+1,5,0.2,Math.PI-0.2);
   else if(med){ctx.moveTo(fx-5,fy+5);ctx.lineTo(fx+5,fy+5);}
   else ctx.arc(fx,fy+8,5,Math.PI+0.2,-0.2);
   ctx.stroke();ctx.restore();
 }
+
 function render(){
   const d=checkReset();
-  const smoke=d.smokeLogs.length,coffee=d.coffeeLogs.length;
+  const smoke=d.smokeLogs.length;
+  const coffee=d.coffeeLogs.length;
   const now=new Date();
   const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('today-label').textContent=days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()];
   document.getElementById('today-smoke').textContent=smoke;
   document.getElementById('today-coffee').textContent=coffee;
-  const sb=document.getElementById('score-btn');
-  sb.textContent=d.score?d.score+'/10':'?/10';
-  sb.className='day-score-btn'+(d.score?' rated':'');
+
+  const scoreBtn=document.getElementById('score-btn');
+  scoreBtn.textContent=d.score?d.score+'/10':'?/10';
+  scoreBtn.className='day-score-btn'+(d.score?' rated':'');
+
+  document.getElementById('smoke-del-btn').style.visibility=smoke>0?'visible':'hidden';
+  document.getElementById('coffee-del-btn').style.visibility=coffee>0?'visible':'hidden';
+
   const sportMap={'Leg Day':'leg','Upper Body':'upper','Cardio':'cardio','Rest Day':'rest'};
   ['leg','upper','cardio','rest'].forEach(k=>document.getElementById('sport-'+k).className='sport-opt');
   if(d.sport&&sportMap[d.sport])document.getElementById('sport-'+sportMap[d.sport]).className='sport-opt active';
   document.getElementById('sport-done-tag').style.display=d.sport?'':'none';
+
   const logEl=document.getElementById('today-log');
-  logEl.innerHTML=smoke===0?'<div class="empty">No cigarettes today 🎉</div>':
-    d.smokeLogs.map((l,i)=>`<div class="log-item"><div><div class="log-time">${l.label}</div><div class="log-num">#${i+1}</div></div><button class="log-del" onclick="deleteSmoke(${i})">×</button></div>`).reverse().join('');
+  logEl.innerHTML=smoke===0
+    ?'<div class="empty">No cigarettes today 🎉</div>'
+    :d.smokeLogs.map((l,i)=>`<div class="log-item"><div><div class="log-time">${l.label}</div><div class="log-num">#${i+1}</div></div><button class="log-del" onclick="deleteSmoke(${i})">×</button></div>`).reverse().join('');
+
   drawLung(smoke);
 }
+
 function renderHistory(){
-  const hist=getAllHistory();const el=document.getElementById('history-list');
+  const hist=getAllHistory();
+  const el=document.getElementById('history-list');
   if(hist.length===0){el.innerHTML='<div class="empty">No history yet</div>';return}
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   el.innerHTML=hist.map((h,i)=>{
-    const prev=hist[i+1],diff=prev!=null?h.smoke-prev.smoke:null;
+    const prev=hist[i+1];
+    const diff=prev!=null?h.smoke-prev.smoke:null;
     let diffHtml='';
     if(diff!==null){
-      if(diff<0)diffHtml=`<span class="hist-diff diff-good">${diff} less</span>`;
-      else if(diff>0)diffHtml=`<span class="hist-diff diff-bad">+${diff} more</span>`;
-      else diffHtml=`<span class="hist-diff diff-same">same</span>`;
+      if(diff<0)diffHtml=`<span class="hist-diff">${diff} less</span>`;
+      else if(diff>0)diffHtml=`<span class="hist-diff">+${diff} more</span>`;
+      else diffHtml=`<span class="hist-diff">same</span>`;
     }
     const [y,m,d2]=h.date.split('-');
     const scoreStr=h.score?`<span class="hist-score">${h.score}/10</span>`:'';
@@ -443,6 +497,7 @@ function renderHistory(){
     </div>`;
   }).join('');
 }
+
 setInterval(()=>{const d=getData();if(d&&d.date!==todayKey())render();},60000);
 render();
 </script>
