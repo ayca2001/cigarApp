@@ -1,120 +1,95 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Günlük Takip">
-<title>Günlük Takip</title>
+<meta name="apple-mobile-web-app-title" content="Daily Tracker">
+<title>Daily Tracker</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#f5f5f0;--card:#fff;--border:#e0e0d8;--text:#1a1a1a;--muted:#888;
-  --red:#e74c3c;--blue:#2980b9;--green:#27ae60;--purple:#8e44ad;--amber:#f39c12;
+  --bg:#f2f2f2;--card:#fff;--border:#ddd;--text:#111;--muted:#888;
+  --accent:#222;--accent2:#444;--subtle:#e8e8e8;
 }
 @media(prefers-color-scheme:dark){
-  :root{--bg:#1a1a1a;--card:#242424;--border:#333;--text:#f0f0f0;--muted:#999}
+  :root{--bg:#111;--card:#1c1c1c;--border:#2a2a2a;--text:#f0f0f0;--muted:#666;--accent:#eee;--accent2:#aaa;--subtle:#252525}
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .app{max-width:430px;margin:0 auto;padding:0 0 80px}
 
-/* NAV */
 .tab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--card);border-top:0.5px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
 .tab-btn{flex:1;padding:12px 0 10px;background:none;border:none;cursor:pointer;font-size:10px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s}
-.tab-btn.active{color:var(--red)}
+.tab-btn.active{color:var(--text)}
 .tab-icon{font-size:20px;line-height:1}
 
-/* PAGES */
-.page{display:none;padding:16px 16px}
+.page{display:none;padding:16px}
 .page.active{display:block}
 
-/* HEADER */
-.header{text-align:center;padding:20px 0 4px;position:relative}
-.header h1{font-size:17px;font-weight:600}
+.header{text-align:center;padding:20px 0 4px}
+.header h1{font-size:17px;font-weight:600;letter-spacing:.2px}
 .date-label{font-size:13px;color:var(--muted);margin-top:3px}
+.day-score-wrap{display:flex;justify-content:center;margin-top:7px}
+.day-score-btn{background:none;border:0.5px solid var(--border);cursor:pointer;font-size:12px;color:var(--muted);font-weight:500;padding:4px 14px;border-radius:20px}
+.day-score-btn.rated{color:var(--text);border-color:var(--accent2)}
 
-/* DAY SCORE */
-.day-score-wrap{display:flex;justify-content:center;margin-top:6px}
-.day-score-btn{background:none;border:none;cursor:pointer;font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.3px;padding:4px 10px;border-radius:20px;border:0.5px solid var(--border)}
-.day-score-btn.rated{color:var(--amber);border-color:var(--amber)}
-
-/* TRACKER GRID */
-.tracker-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
-
-/* TRACKER CARD */
-.tracker-card{background:var(--card);border:0.5px solid var(--border);border-radius:18px;padding:16px 14px;display:flex;flex-direction:column;gap:10px}
+.tracker-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.tracker-card{background:var(--card);border:0.5px solid var(--border);border-radius:18px;padding:16px 14px;display:flex;flex-direction:column;gap:12px}
 .tracker-card.full{grid-column:1/-1}
-.card-header{display:flex;align-items:center;justify-content:space-between}
-.card-title{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.3px;text-transform:uppercase}
-.card-count{font-size:32px;font-weight:700;line-height:1}
-.card-sub{font-size:11px;color:var(--muted)}
-.track-btn{width:100%;padding:11px;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;color:#fff;transition:transform .1s,opacity .1s}
-.track-btn:active{transform:scale(.96);opacity:.85}
-.btn-red{background:var(--red)}
-.btn-blue{background:var(--blue)}
+.card-title{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
+.card-count{font-size:36px;font-weight:700;line-height:1;color:var(--text)}
+.card-sub{font-size:11px;color:var(--muted);margin-top:2px}
 
-/* SPORT BUTTONS */
+.add-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;color:var(--bg);font-size:26px;font-weight:300;display:flex;align-items:center;justify-content:center;transition:transform .1s,opacity .1s;align-self:flex-end;line-height:1}
+.add-btn:active{transform:scale(.9);opacity:.75}
+
 .sport-btns{display:flex;flex-direction:column;gap:7px}
-.sport-opt{width:100%;padding:10px;border:0.5px solid var(--border);border-radius:12px;background:none;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;transition:all .15s;text-align:left;padding-left:14px}
-.sport-opt.active{border-color:var(--green);background:#eafaf1;color:#1e8449}
-@media(prefers-color-scheme:dark){.sport-opt.active{background:#1a3d28;color:#5dbd7a}}
+.sport-opt{width:100%;padding:10px 14px;border:0.5px solid var(--border);border-radius:12px;background:none;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;text-align:left}
+.sport-opt.active{border-color:var(--text);background:var(--subtle);color:var(--text)}
 .sport-opt:active{transform:scale(.98)}
 
-/* LUNG */
 .lung-wrap{display:flex;justify-content:center;margin:4px 0 0}
 
-/* LOG LIST */
 .section-title{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin:18px 0 8px}
 .log-list{display:flex;flex-direction:column;gap:7px}
 .log-item{background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between}
 .log-time{font-size:14px;font-weight:500}
 .log-num{font-size:12px;color:var(--muted)}
-.log-del{background:none;border:none;cursor:pointer;color:#ccc;font-size:20px;padding:0 0 0 12px;line-height:1}
-.log-del:active{color:var(--red)}
+.log-del{background:none;border:none;cursor:pointer;color:var(--border);font-size:20px;padding:0 0 0 12px;line-height:1}
+.log-del:active{color:var(--text)}
 .empty{text-align:center;color:var(--muted);font-size:14px;padding:30px 0}
 
-/* HISTORY */
 .hist-day{background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px}
 .hist-date{font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
-.hist-score{font-size:12px;color:var(--amber);font-weight:600}
-.hist-row{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap}
+.hist-score{font-size:12px;color:var(--accent2);font-weight:600}
+.hist-row{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap;align-items:center}
 .hist-stat{display:flex;flex-direction:column}
 .hist-stat-val{font-size:18px;font-weight:700}
 .hist-stat-lbl{font-size:11px;color:var(--muted)}
-.hist-diff{font-size:12px;font-weight:500;padding:2px 9px;border-radius:20px;align-self:flex-end}
-.diff-good{background:#e8f8ef;color:#1e8449}
-.diff-bad{background:#fdecea;color:#c0392b}
-.diff-same{background:#f4f4f4;color:var(--muted)}
-@media(prefers-color-scheme:dark){
-  .diff-good{background:#1a3d28;color:#5dbd7a}
-  .diff-bad{background:#3d1a1a;color:#e07070}
-  .diff-same{background:#2a2a2a}
-}
-.sport-tag{font-size:11px;padding:2px 8px;border-radius:10px;background:#eafaf1;color:#1e8449;font-weight:500}
-@media(prefers-color-scheme:dark){.sport-tag{background:#1a3d28;color:#5dbd7a}}
+.hist-diff{font-size:12px;font-weight:500;padding:2px 9px;border-radius:20px}
+.diff-good{background:var(--subtle);color:var(--accent2)}
+.diff-bad{background:var(--subtle);color:var(--muted)}
+.diff-same{background:var(--subtle);color:var(--muted)}
+.sport-tag{font-size:11px;padding:2px 9px;border-radius:10px;background:var(--subtle);color:var(--accent2);font-weight:500}
 
-/* SETTINGS */
 .settings-card{background:var(--card);border:0.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
 .setting-row{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border)}
 .setting-row:last-child{border-bottom:none}
 .setting-lbl{font-size:15px}
 .setting-sub{font-size:12px;color:var(--muted);margin-top:2px}
-input[type=text]{background:var(--bg);border:0.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:15px;color:var(--text);width:100%;margin-top:8px;outline:none}
-input[type=text]:focus{border-color:var(--red)}
-.save-btn{width:100%;padding:13px;background:var(--red);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
-.save-btn:active{opacity:.85}
+input[type=text]{background:var(--subtle);border:0.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:15px;color:var(--text);width:100%;margin-top:8px;outline:none}
+.save-btn{width:100%;padding:13px;background:var(--accent);color:var(--bg);border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+.save-btn:active{opacity:.8}
 
-/* TOGGLE */
 .toggle{position:relative;width:44px;height:26px;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0}
 .toggle-slider{position:absolute;inset:0;background:#ccc;border-radius:26px;cursor:pointer;transition:.3s}
 .toggle-slider:before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
-.toggle input:checked+.toggle-slider{background:var(--green)}
+.toggle input:checked+.toggle-slider{background:var(--accent)}
 .toggle input:checked+.toggle-slider:before{transform:translateX(18px)}
 
-/* SCORE MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:flex;align-items:flex-end;justify-content:center}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;justify-content:center}
 .modal-overlay.hidden{display:none}
 .modal{background:var(--card);border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-width:430px}
 .modal h2{font-size:17px;font-weight:600;text-align:center;margin-bottom:4px}
@@ -122,24 +97,21 @@ input[type=text]:focus{border-color:var(--red)}
 .score-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
 .score-opt{padding:12px 0;border:0.5px solid var(--border);border-radius:12px;background:none;font-size:18px;font-weight:700;cursor:pointer;color:var(--text);transition:all .15s}
 .score-opt:active{transform:scale(.94)}
-.score-opt.selected{background:var(--amber);border-color:var(--amber);color:#fff}
+.score-opt.selected{background:var(--accent);border-color:var(--accent);color:var(--bg)}
 .modal-cancel{width:100%;padding:13px;background:none;border:0.5px solid var(--border);border-radius:14px;font-size:15px;color:var(--muted);cursor:pointer;margin-top:4px}
 
-/* Toast */
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:24px;font-size:14px;opacity:0;transition:all .3s;pointer-events:none;z-index:200;white-space:nowrap}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--accent);color:var(--bg);padding:10px 20px;border-radius:24px;font-size:14px;opacity:0;transition:all .3s;pointer-events:none;z-index:200;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(prefers-color-scheme:dark){.toast{background:#f0f0f0;color:#1a1a1a}}
-@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
-.pulse{animation:pulse .3s ease}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.08)}100%{transform:scale(1)}}
+.pop{animation:pop .25s ease}
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- ANA SAYFA -->
 <div class="page active" id="page-home">
   <div class="header">
-    <h1>Günlük Takip</h1>
+    <h1>Daily Tracker</h1>
     <div class="date-label" id="today-label"></div>
     <div class="day-score-wrap">
       <button class="day-score-btn" id="score-btn" onclick="openScoreModal()">?/10</button>
@@ -147,35 +119,28 @@ input[type=text]:focus{border-color:var(--red)}
   </div>
 
   <div class="tracker-grid">
-    <!-- SİGARA -->
     <div class="tracker-card">
-      <div class="card-header">
-        <span class="card-title">🚬 Sigara</span>
-      </div>
+      <div class="card-title">🚬 Cigarettes</div>
       <div>
         <div class="card-count" id="today-smoke">0</div>
-        <div class="card-sub">bugün</div>
+        <div class="card-sub">today</div>
       </div>
-      <button class="track-btn btn-red pulse-target" id="smoke-btn" onclick="addSmoke()">İçtim</button>
+      <button class="add-btn" id="smoke-btn" onclick="addSmoke()">+</button>
     </div>
 
-    <!-- KAHVE -->
     <div class="tracker-card">
-      <div class="card-header">
-        <span class="card-title">☕ Kahve</span>
-      </div>
+      <div class="card-title">☕ Coffee</div>
       <div>
         <div class="card-count" id="today-coffee">0</div>
-        <div class="card-sub">bugün</div>
+        <div class="card-sub">today</div>
       </div>
-      <button class="track-btn btn-blue" onclick="addCoffee()">İçtim</button>
+      <button class="add-btn" onclick="addCoffee()">+</button>
     </div>
 
-    <!-- SPOR -->
     <div class="tracker-card full">
-      <div class="card-header">
-        <span class="card-title">💪 Spor</span>
-        <span id="sport-done-tag" style="display:none" class="sport-tag">✓ Yapıldı</span>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="card-title">💪 Workout</div>
+        <span id="sport-done-tag" style="display:none" class="sport-tag">✓ Done</span>
       </div>
       <div class="sport-btns">
         <button class="sport-opt" id="sport-leg" onclick="setSport('Leg Day')">🦵 Leg Day</button>
@@ -186,37 +151,33 @@ input[type=text]:focus{border-color:var(--red)}
     </div>
   </div>
 
-  <!-- AKCİĞER -->
   <div class="lung-wrap">
     <canvas id="lung-canvas" width="260" height="185"></canvas>
   </div>
 
-  <!-- BUGÜNKÜ KAYITLAR -->
-  <div class="section-title">Sigara kayıtları</div>
+  <div class="section-title">Cigarette log</div>
   <div class="log-list" id="today-log"></div>
 </div>
 
-<!-- GEÇMİŞ -->
 <div class="page" id="page-history">
-  <div class="header"><h1>Geçmiş</h1></div>
+  <div class="header"><h1>History</h1></div>
   <div id="history-list"></div>
 </div>
 
-<!-- AYARLAR -->
 <div class="page" id="page-settings">
-  <div class="header"><h1>Ayarlar</h1></div>
-
+  <div class="header"><h1>Settings</h1></div>
   <div class="settings-card">
     <div class="setting-row">
       <div style="flex:1">
-        <div class="setting-lbl">Uyarı sesi metni</div>
-        <input type="text" id="voice-msg" value="İçme!">
+        <div class="setting-lbl">Alert message</div>
+        <div class="setting-sub">Spoken when you log a cigarette</div>
+        <input type="text" id="voice-msg" value="Don't smoke!">
       </div>
     </div>
     <div class="setting-row">
       <div>
-        <div class="setting-lbl">Ses açık</div>
-        <div class="setting-sub">Sigara butonunda ses çıksın</div>
+        <div class="setting-lbl">Sound enabled</div>
+        <div class="setting-sub">Play voice alert on log</div>
       </div>
       <label class="toggle">
         <input type="checkbox" id="sound-toggle" checked>
@@ -224,49 +185,43 @@ input[type=text]:focus{border-color:var(--red)}
       </label>
     </div>
     <div class="setting-row">
-      <div style="flex:1;padding-right:12px">
-        <div class="setting-lbl">Sesi dene</div>
-      </div>
-      <button class="save-btn" style="width:auto;padding:8px 18px;margin-top:0;font-size:13px" onclick="testVoice()">Dene</button>
+      <div class="setting-lbl">Test voice</div>
+      <button class="save-btn" style="width:auto;padding:8px 18px;margin-top:0;font-size:13px" onclick="testVoice()">Play</button>
     </div>
   </div>
-
-  <button class="save-btn" onclick="saveSettings()">Kaydet</button>
-
-  <div class="section-title" style="margin-top:24px">Tehlikeli bölge</div>
+  <button class="save-btn" onclick="saveSettings()">Save</button>
+  <div class="section-title" style="margin-top:24px">Danger zone</div>
   <div class="settings-card">
     <div class="setting-row" onclick="clearAll()" style="cursor:pointer">
       <div>
-        <div class="setting-lbl" style="color:var(--red)">Tüm verileri sil</div>
-        <div class="setting-sub">Bu işlem geri alınamaz</div>
+        <div class="setting-lbl">Delete all data</div>
+        <div class="setting-sub">This cannot be undone</div>
       </div>
       <div style="color:var(--muted)">›</div>
     </div>
   </div>
 </div>
 
-</div><!-- /app -->
+</div>
 
-<!-- TAB BAR -->
 <div class="tab-bar">
   <button class="tab-btn active" onclick="showPage('home',this)">
-    <span class="tab-icon">🏠</span>Ana sayfa
+    <span class="tab-icon">🏠</span>Home
   </button>
   <button class="tab-btn" onclick="showPage('history',this)">
-    <span class="tab-icon">📊</span>Geçmiş
+    <span class="tab-icon">📊</span>History
   </button>
   <button class="tab-btn" onclick="showPage('settings',this)">
-    <span class="tab-icon">⚙️</span>Ayarlar
+    <span class="tab-icon">⚙️</span>Settings
   </button>
 </div>
 
-<!-- SKOR MODAL -->
 <div class="modal-overlay hidden" id="score-modal">
   <div class="modal">
-    <h2>Güne puan ver</h2>
-    <div class="modal-sub" id="score-modal-sub">Bugün nasıldı?</div>
+    <h2>Rate your day</h2>
+    <div class="modal-sub" id="score-modal-sub">How was today?</div>
     <div class="score-grid" id="score-grid"></div>
-    <button class="modal-cancel" onclick="closeScoreModal()">İptal</button>
+    <button class="modal-cancel" onclick="closeScoreModal()">Cancel</button>
   </div>
 </div>
 
@@ -274,17 +229,11 @@ input[type=text]:focus{border-color:var(--red)}
 
 <script>
 const KD='sc_daily',KA='sc_all',KT='sc_total',KS='sc_settings';
-
 function getData(){try{return JSON.parse(localStorage.getItem(KD)||'null')}catch{return null}}
 function getAllHistory(){try{return JSON.parse(localStorage.getItem(KA)||'[]')}catch{return[]}}
 function getTotal(){return parseInt(localStorage.getItem(KT)||'0')}
-function getSettings(){try{return JSON.parse(localStorage.getItem(KS)||'{"msg":"İçme!","sound":true}')}catch{return{msg:'İçme!',sound:true}}}
-
-function todayKey(){
-  const d=new Date();
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
-
+function getSettings(){try{return JSON.parse(localStorage.getItem(KS)||'{"msg":"Don\'t smoke!","sound":true}')}catch{return{msg:"Don't smoke!",sound:true}}}
+function todayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function checkReset(){
   let d=getData();const tk=todayKey();
   if(!d||d.date!==tk){
@@ -300,7 +249,6 @@ function checkReset(){
   return d;
 }
 function saveDaily(d){localStorage.setItem(KD,JSON.stringify(d))}
-
 function addSmoke(){
   const d=checkReset();
   const now=new Date();
@@ -308,78 +256,62 @@ function addSmoke(){
   d.smokeLogs.push({ts:now.getTime(),label});
   saveDaily(d);
   localStorage.setItem(KT,(getTotal()+1).toString());
-  speakMsg();
-  pulsBtn('smoke-btn');
-  render();
-  showToast('🚬 Kaydedildi — '+label);
+  speakMsg();animBtn('smoke-btn');render();
+  showToast('🚬 Logged — '+label);
 }
-
 function addCoffee(){
   const d=checkReset();
   const now=new Date();
   const label=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
   d.coffeeLogs.push({ts:now.getTime(),label});
-  saveDaily(d);
-  render();
-  showToast('☕ Kahve kaydedildi — '+label);
+  saveDaily(d);render();
+  showToast('☕ Coffee logged — '+label);
 }
-
 function setSport(type){
   const d=checkReset();
-  if(d.sport===type){d.sport=null;}else{d.sport=type;}
+  d.sport=d.sport===type?null:type;
   saveDaily(d);render();
-  if(d.sport)showToast('💪 '+type+' kaydedildi');
+  if(d.sport)showToast('💪 '+type+' logged');
 }
-
 function deleteSmoke(idx){
-  const d=checkReset();
-  d.smokeLogs.splice(idx,1);
-  saveDaily(d);
+  const d=checkReset();d.smokeLogs.splice(idx,1);saveDaily(d);
   localStorage.setItem(KT,Math.max(0,getTotal()-1).toString());
-  render();showToast('Kayıt silindi');
+  render();showToast('Entry deleted');
 }
-
 function speakMsg(){
   const s=getSettings();
   if(!s.sound||!window.speechSynthesis)return;
   window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(s.msg||'İçme!');
-  u.lang='tr-TR';u.rate=1;u.volume=1;
+  const u=new SpeechSynthesisUtterance(s.msg||"Don't smoke!");
+  u.lang='en-US';u.rate=1;u.volume=1;
   window.speechSynthesis.speak(u);
 }
-
 function testVoice(){
-  const msg=document.getElementById('voice-msg').value||'İçme!';
-  if(!window.speechSynthesis){showToast('Ses desteklenmiyor');return}
+  const msg=document.getElementById('voice-msg').value||"Don't smoke!";
+  if(!window.speechSynthesis){showToast('Speech not supported');return}
   window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(msg);u.lang='tr-TR';
+  const u=new SpeechSynthesisUtterance(msg);u.lang='en-US';
   window.speechSynthesis.speak(u);
 }
-
 function saveSettings(){
   const msg=document.getElementById('voice-msg').value;
   const sound=document.getElementById('sound-toggle').checked;
   localStorage.setItem(KS,JSON.stringify({msg,sound}));
-  showToast('Kaydedildi!');
+  showToast('Saved!');
 }
-
 function clearAll(){
-  if(!confirm('Tüm veriler silinsin mi?'))return;
+  if(!confirm('Delete all data? This cannot be undone.'))return;
   [KD,KA,KT].forEach(k=>localStorage.removeItem(k));
-  render();showToast('Veriler silindi');
+  render();showToast('All data deleted');
 }
-
-/* SCORE MODAL */
 function openScoreModal(){
   const d=checkReset();
-  document.getElementById('score-modal-sub').textContent=d.score?'Bugünkü puanın: '+d.score+'/10 — değiştir':'Bugün nasıldı?';
-  const grid=document.getElementById('score-grid');
-  grid.innerHTML='';
+  document.getElementById('score-modal-sub').textContent=d.score?'Current score: '+d.score+'/10 — change it':'How was today?';
+  const grid=document.getElementById('score-grid');grid.innerHTML='';
   for(let i=1;i<=10;i++){
     const btn=document.createElement('button');
     btn.className='score-opt'+(d.score===i?' selected':'');
-    btn.textContent=i;
-    btn.onclick=()=>setScore(i);
+    btn.textContent=i;btn.onclick=()=>setScore(i);
     grid.appendChild(btn);
   }
   document.getElementById('score-modal').classList.remove('hidden');
@@ -387,60 +319,53 @@ function openScoreModal(){
 function closeScoreModal(){document.getElementById('score-modal').classList.add('hidden')}
 function setScore(n){
   const d=checkReset();d.score=n;saveDaily(d);
-  closeScoreModal();render();showToast('⭐ Güne '+n+'/10 puan verildi');
+  closeScoreModal();render();showToast('⭐ Day rated '+n+'/10');
 }
-
-function pulsBtn(id){
+function animBtn(id){
   const b=document.getElementById(id);
-  b.classList.remove('pulse');void b.offsetWidth;b.classList.add('pulse');
+  b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');
 }
-
 function showPage(name,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  el.classList.add('active');
+  document.getElementById('page-'+name).classList.add('active');el.classList.add('active');
   if(name==='history')renderHistory();
-  if(name==='settings'){
-    const s=getSettings();
-    document.getElementById('voice-msg').value=s.msg||'İçme!';
-    document.getElementById('sound-toggle').checked=s.sound!==false;
-  }
+  if(name==='settings'){const s=getSettings();document.getElementById('voice-msg').value=s.msg||"Don't smoke!";document.getElementById('sound-toggle').checked=s.sound!==false;}
 }
-
 function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);
 }
-
-/* LUNG */
 function drawLung(count){
   const canvas=document.getElementById('lung-canvas');
   const ctx=canvas.getContext('2d');
   ctx.clearRect(0,0,260,185);
   const ratio=Math.min(count/30,1);
   const isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
-  const r=Math.round(40+ratio*180),g=Math.round(180-ratio*150),b2=Math.round(80-ratio*50);
-  const lc=`rgb(${r},${g},${b2})`;
-  const draw=(flip)=>{
+  const base=isDark?200:60;
+  const rv=Math.round(base+ratio*(isDark?-150:150));
+  const gv=Math.round(base+ratio*(isDark?-150:150));
+  const bv=Math.round(base+ratio*(isDark?-150:150));
+  const lc=`rgb(${rv},${gv},${bv})`;
+  const stroke=isDark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)';
+  const drawLobe=(flip)=>{
     ctx.save();ctx.beginPath();
     if(!flip){ctx.moveTo(115,36);ctx.bezierCurveTo(72,36,48,64,48,102);ctx.bezierCurveTo(48,144,67,162,96,162);ctx.bezierCurveTo(106,165,111,157,115,143);}
     else{ctx.moveTo(145,36);ctx.bezierCurveTo(188,36,212,64,212,102);ctx.bezierCurveTo(212,144,193,162,164,162);ctx.bezierCurveTo(154,165,149,157,145,143);}
     ctx.closePath();ctx.fillStyle=lc;ctx.fill();
-    ctx.strokeStyle=isDark?'rgba(255,255,255,.12)':'rgba(0,0,0,.1)';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+    ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
   };
-  draw(false);draw(true);
+  drawLobe(false);drawLobe(true);
   if(count>0){
     const spots=Math.min(Math.floor(count/2)+1,14);
     const rng=s=>{let x=Math.sin(s)*10000;return x-Math.floor(x)};
-    ctx.globalAlpha=Math.min(0.15+ratio*0.5,0.62);
+    ctx.globalAlpha=Math.min(0.12+ratio*0.45,0.55);
     for(let i=0;i<spots;i++){
       const side=i%2;
       const cx=side===0?(65+rng(i*7)*36):(152+rng(i*7)*36);
       const cy=72+rng(i*13)*76,rr=5+rng(i*17)*7;
       ctx.beginPath();ctx.arc(cx,cy,rr,0,Math.PI*2);
-      ctx.fillStyle=isDark?'#1a0a0a':'#3d1a0a';ctx.fill();
+      ctx.fillStyle=isDark?'#000':'#333';ctx.fill();
     }
     ctx.globalAlpha=1;
   }
@@ -448,87 +373,76 @@ function drawLung(count){
   ctx.beginPath();ctx.moveTo(130,18);ctx.lineTo(130,44);
   ctx.moveTo(130,44);ctx.bezierCurveTo(116,49,107,55,102,63);
   ctx.moveTo(130,44);ctx.bezierCurveTo(144,49,153,55,158,63);
-  ctx.strokeStyle=isDark?'rgba(255,255,255,.28)':'rgba(0,0,0,.18)';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.stroke();ctx.restore();
+  ctx.strokeStyle=isDark?'rgba(255,255,255,.22)':'rgba(0,0,0,.15)';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.stroke();ctx.restore();
   const fx=130,fy=14,fr=12;
   ctx.save();ctx.beginPath();ctx.arc(fx,fy,fr,0,Math.PI*2);
   const happy=ratio<0.3,med=ratio<0.65;
-  ctx.fillStyle=happy?'#f1c40f':med?'#e67e22':'#e74c3c';ctx.fill();
-  ctx.strokeStyle=isDark?'rgba(255,255,255,.15)':'rgba(0,0,0,.12)';ctx.lineWidth=1;ctx.stroke();
-  ctx.fillStyle='rgba(0,0,0,.72)';
+  const faceGray=isDark?(happy?200:med?150:100):(happy?220:med?170:120);
+  ctx.fillStyle=`rgb(${faceGray},${faceGray},${faceGray})`;ctx.fill();
+  ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();
+  const eyeColor=isDark?'rgba(0,0,0,.8)':'rgba(0,0,0,.7)';
+  ctx.fillStyle=eyeColor;
   if(!happy&&!med){
-    ctx.lineWidth=1.5;ctx.strokeStyle='rgba(0,0,0,.72)';
+    ctx.lineWidth=1.5;ctx.strokeStyle=eyeColor;
     for(const ex of [fx-4,fx+4]){
       ctx.beginPath();ctx.moveTo(ex-2,fy-4);ctx.lineTo(ex+2,fy-2);ctx.stroke();
       ctx.beginPath();ctx.moveTo(ex+2,fy-4);ctx.lineTo(ex-2,fy-2);ctx.stroke();
     }
   }else{ctx.beginPath();ctx.arc(fx-4,fy-2,1.5,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(fx+4,fy-2,1.5,0,Math.PI*2);ctx.fill();}
-  ctx.strokeStyle='rgba(0,0,0,.68)';ctx.lineWidth=1.8;ctx.lineCap='round';
+  ctx.strokeStyle=eyeColor;ctx.lineWidth=1.8;ctx.lineCap='round';
   ctx.beginPath();
   if(happy)ctx.arc(fx,fy+1,5,0.2,Math.PI-0.2);
   else if(med){ctx.moveTo(fx-5,fy+5);ctx.lineTo(fx+5,fy+5);}
   else ctx.arc(fx,fy+8,5,Math.PI+0.2,-0.2);
   ctx.stroke();ctx.restore();
 }
-
-/* RENDER */
 function render(){
   const d=checkReset();
   const smoke=d.smokeLogs.length,coffee=d.coffeeLogs.length;
   const now=new Date();
-  const days=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
-  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('today-label').textContent=days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()];
   document.getElementById('today-smoke').textContent=smoke;
   document.getElementById('today-coffee').textContent=coffee;
-
-  // score btn
   const sb=document.getElementById('score-btn');
   sb.textContent=d.score?d.score+'/10':'?/10';
   sb.className='day-score-btn'+(d.score?' rated':'');
-
-  // sport
-  ['leg','upper','cardio','rest'].forEach(k=>document.getElementById('sport-'+k).className='sport-opt');
   const sportMap={'Leg Day':'leg','Upper Body':'upper','Cardio':'cardio','Rest Day':'rest'};
+  ['leg','upper','cardio','rest'].forEach(k=>document.getElementById('sport-'+k).className='sport-opt');
   if(d.sport&&sportMap[d.sport])document.getElementById('sport-'+sportMap[d.sport]).className='sport-opt active';
-  const doneTag=document.getElementById('sport-done-tag');
-  doneTag.style.display=d.sport?'':'none';
-
-  // log
+  document.getElementById('sport-done-tag').style.display=d.sport?'':'none';
   const logEl=document.getElementById('today-log');
-  logEl.innerHTML=smoke===0?'<div class="empty">Bugün henüz sigara içmedin 🎉</div>':
-    d.smokeLogs.map((l,i)=>`<div class="log-item"><div><div class="log-time">${l.label}</div><div class="log-num">#${i+1} sigara</div></div><button class="log-del" onclick="deleteSmoke(${i})">×</button></div>`).reverse().join('');
-
+  logEl.innerHTML=smoke===0?'<div class="empty">No cigarettes today 🎉</div>':
+    d.smokeLogs.map((l,i)=>`<div class="log-item"><div><div class="log-time">${l.label}</div><div class="log-num">#${i+1}</div></div><button class="log-del" onclick="deleteSmoke(${i})">×</button></div>`).reverse().join('');
   drawLung(smoke);
 }
-
 function renderHistory(){
   const hist=getAllHistory();const el=document.getElementById('history-list');
-  if(hist.length===0){el.innerHTML='<div class="empty">Henüz geçmiş yok</div>';return}
-  const months=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  if(hist.length===0){el.innerHTML='<div class="empty">No history yet</div>';return}
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   el.innerHTML=hist.map((h,i)=>{
-    const prev=hist[i+1];
-    const diff=prev!=null?h.smoke-prev.smoke:null;
+    const prev=hist[i+1],diff=prev!=null?h.smoke-prev.smoke:null;
     let diffHtml='';
     if(diff!==null){
-      if(diff<0)diffHtml=`<span class="hist-diff diff-good">${diff} az</span>`;
-      else if(diff>0)diffHtml=`<span class="hist-diff diff-bad">+${diff} fazla</span>`;
-      else diffHtml=`<span class="hist-diff diff-same">Aynı</span>`;
+      if(diff<0)diffHtml=`<span class="hist-diff diff-good">${diff} less</span>`;
+      else if(diff>0)diffHtml=`<span class="hist-diff diff-bad">+${diff} more</span>`;
+      else diffHtml=`<span class="hist-diff diff-same">same</span>`;
     }
     const [y,m,d2]=h.date.split('-');
-    const scoreStr=h.score?`<span class="hist-score">⭐ ${h.score}/10</span>`:'';
+    const scoreStr=h.score?`<span class="hist-score">${h.score}/10</span>`:'';
     const sportStr=h.sport?`<span class="sport-tag">${h.sport}</span>`:'';
     return`<div class="hist-day">
       <div class="hist-date"><span>${parseInt(d2)} ${months[parseInt(m)-1]} ${y}</span>${scoreStr}</div>
       <div class="hist-row">
-        <div class="hist-stat"><div class="hist-stat-val">🚬 ${h.smoke}</div><div class="hist-stat-lbl">sigara</div></div>
-        <div class="hist-stat"><div class="hist-stat-val">☕ ${h.coffee||0}</div><div class="hist-stat-lbl">kahve</div></div>
+        <div class="hist-stat"><div class="hist-stat-val">🚬 ${h.smoke}</div><div class="hist-stat-lbl">cigarettes</div></div>
+        <div class="hist-stat"><div class="hist-stat-val">☕ ${h.coffee||0}</div><div class="hist-stat-lbl">coffees</div></div>
         ${h.sport?`<div class="hist-stat">${sportStr}</div>`:''}
         ${diffHtml}
       </div>
     </div>`;
   }).join('');
 }
-
 setInterval(()=>{const d=getData();if(d&&d.date!==todayKey())render();},60000);
 render();
 </script>
